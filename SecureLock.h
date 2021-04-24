@@ -15,9 +15,12 @@ private:
     
 };
 enum LockState
-    {
-        Locked,
-        Unlocked,
-        Authorized
-    };
+{
+    Locked,
+    Locking,
+    Unlocked,
+    Unlocking,
+    Authenticated,
+    Authenticating,
+};
 #endif
