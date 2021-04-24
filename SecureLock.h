@@ -1,6 +1,8 @@
 #ifndef SecureLock_h
 #define SecureLock_h
 
+#include<Servo.h>
+
 class SecureLock
 {
     
@@ -12,7 +14,7 @@ public:
     int State();
 private:
     int state;
-    
+    Servo servo;    
 };
 enum LockState
 {
