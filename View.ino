@@ -4,7 +4,6 @@ View::View()
 {
 	lcd.init();
 	lcd.backlight();
-	lcd.autoscroll();
 }
 void View::Message(String message)
 {
@@ -14,5 +13,15 @@ void View::Message(String message)
 }
 void View::MessageLCD(String message)
 {
-	lcd.println(message);
+	lcd.clear();
+	lcd.setCursor(0, 0);
+	lcd.print(message);
+}
+void View::MessageLCD(String message1, String message2)
+{
+	lcd.clear();
+	lcd.setCursor(0, 0);
+	lcd.print(message1);
+	lcd.setCursor(0, 1);
+	lcd.print(message2);
 }

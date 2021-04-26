@@ -10,9 +10,9 @@ class View
 public:
     View();
     void Message(String message);
-    void MessageLCD(String message);
+    void MessageLCD(String message1);
+    void MessageLCD(String message1, String message2);
     LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2);
-
 private:
     WidgetTerminal terminal = WidgetTerminal(V0);
 };
