@@ -4,14 +4,12 @@
 #include <BlynkSimpleEsp8266.h>
 
 #include "SecureLock.h"
-#include "View.h"
 
 char auth[] = "iE7NulbKfx6ZgO4gBgAS4T5ZYjGcA1Ot";
 char ssid[] = "HostpotTP";
 char pass[] = "12345678";
 
 SecureLock lock;
-View view;
 
 void setup()
 {
@@ -20,11 +18,6 @@ void setup()
 	Blynk.begin(auth, ssid, pass, IPAddress(192, 168, 137, 1), 8080);
 
 	lock = SecureLock();
-	view = View();
-
-	view.Message("Starting... Done!");
-	view.lcd.clear();
-	view.lcd.setCursor(0,0);
 }
 
 void loop()
@@ -60,14 +53,9 @@ BLYNK_WRITE(V1)
 		{
 		case Locked:
 			lock.InitAuthNums();
-			view.MessageLCD("Auth number: ", (String)lock.AuthNum);
 			break;
 		case Unlocked:
-			if (lock.Lock() == true)
-			{
-				view.Message("The lock is locked.");
-				view.MessageLCD("Lock is locked.");
-			}
+			lock.Lock();
 			Blynk.virtualWrite(V1, 0);
 			break;
 		}
@@ -88,25 +76,9 @@ BLYNK_WRITE(V2)
 
 		if (lock.Authenticate(authKey) == true)
 		{
-			view.Message("Authenticated successful!");
-			view.MessageLCD("Authenticated!");
-			// Unlocking
-			if (lock.Unlock() == true)
-			{
-				view.Message("The lock is unlocked.");
-				view.MessageLCD("Lock is unlocked.");
-			}
-			else
-			{
-				view.Message("Unlooking is failed");
-				view.Message("Problems: Unknown");
-			}
+			lock.Unlock();
 		}
-		else
-		{
-			view.Message("Authenticated failed!");
-			view.Message("Cannot unlocking the lock.");
-		}
+
 		Blynk.setProperty(V2, "labels", "No need Authentication");
 		Blynk.virtualWrite(V1, 0);
 	}

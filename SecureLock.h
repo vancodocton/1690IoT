@@ -3,6 +3,8 @@
 
 #include<Servo.h>
 
+#include "View.h"
+
 class SecureLock
 {    
 public:
@@ -12,11 +14,12 @@ public:
     bool Authenticate(int authKey);
     int State();
     void InitAuthNums();   
-    int AuthNum;
 private:
+    int AuthNum;
     int AuthKey;
     int state;
-    Servo servo; 
+    Servo servo;
+    View view;
 };
 enum LockState
 {
