@@ -18,6 +18,7 @@ SecureLock::SecureLock()
 }
 bool SecureLock::Lock()
 {
+    view.RGBled(view.Red);
     Serial.println("Locking");
 
     servo.write(0);
@@ -30,6 +31,7 @@ bool SecureLock::Lock()
 }
 bool SecureLock::Unlock()
 {
+    view.RGBled(view.Green);
     AuthKey = -1;
     AuthNum = -1;
 

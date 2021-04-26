@@ -15,6 +15,10 @@ void setup()
 {
 	Serial.begin(9600);
 
+	pinMode(D6, OUTPUT);
+	pinMode(D8, OUTPUT);
+	pinMode(D7, OUTPUT);	
+
 	Blynk.begin(auth, ssid, pass, IPAddress(192, 168, 137, 1), 8080);
 
 	lock = SecureLock();
