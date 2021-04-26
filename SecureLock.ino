@@ -7,11 +7,11 @@
 
 SecureLock::SecureLock()
 {
-    state = Locked;
     servo = Servo();
     servo.attach(D0);
-    
     Serial.println("The lock is initialized");
+
+    Lock();
 }
 bool SecureLock::Lock()
 {
