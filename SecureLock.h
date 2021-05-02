@@ -1,31 +1,33 @@
 #ifndef SecureLock_h
 #define SecureLock_h
 
-#include<Servo.h>
+#include <Servo.h>
+#include <Arduino.h>
 
 #include "View.h"
+#include "RGBLed.h"
 
+#define pinRed D8
+#define pinGreen D7
+#define pinBlue D6
+#define pinServo D0
 class SecureLock
-{    
+{
 public:
     SecureLock();
     bool Lock();
     bool Unlock();
-    bool Authenticate(int authKey);
     int State();
-    void InitAuthNums();   
+
 private:
-    int AuthNum;
-    int AuthKey;
     int state;
-    Servo servo;
-    View view;
+    Servo servo = Servo();
+    RGBLed led = RGBLed(pinRed, pinGreen, pinBlue);
 };
 enum LockState
 {
     Locked,
     Unlocked,
-    Authenticated,
-    Authenticating,
+    Unknown
 };
 #endif

@@ -5,22 +5,30 @@
 #include <LiquidCrystal_I2C.h>
 #include <BlynkSimpleEsp8266.h>
 
+#define VirtualTerminalPin V0
+#define BtnControlPin V1
+#define AuthenticatingPanelPin V2
+#define LockStateValuePin V3
+
+#define LCDAddress 0x27
+#define LCDColumns 16
+#define LCDRows 2
+
 class View
 {
 public:
     View();
-    void Message(String message);
-    void MessageLCD(String message1);
-    void MessageLCD(String message1, String message2);
-    LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2);
-    enum RGBLED
-    {
-        Red,
-        Green,
-        Blue
-    };
-    void RGBled(int color);
+    void Message(String m);
+    void MessageLCD(String me);
+    void MessageLCD(String m1, String m2);
+    void UpdateAuthPanel(int authNums[]);
+    void ResetAuthPanel();
+    void UpdateLockState(String value);
+    void BtnControlForUnlock();
+    void BtnControlForLock();
+
 private:
-    WidgetTerminal terminal = WidgetTerminal(V0);
+    LiquidCrystal_I2C lcd = LiquidCrystal_I2C(LCDAddress, LCDColumns, LCDRows);
+    WidgetTerminal terminal = WidgetTerminal(VirtualTerminalPin);
 };
 #endif

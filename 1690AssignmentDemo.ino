@@ -4,90 +4,110 @@
 #include <BlynkSimpleEsp8266.h>
 
 #include "SecureLock.h"
+#include "View.h"
+#include "Authentication.h"
 
 char auth[] = "iE7NulbKfx6ZgO4gBgAS4T5ZYjGcA1Ot";
 char ssid[] = "HostpotTP";
 char pass[] = "12345678";
 
 SecureLock lock;
+View view;
+Authentication lockAuth;
 
 void setup()
 {
 	Serial.begin(9600);
 
-	pinMode(D6, OUTPUT);
-	pinMode(D8, OUTPUT);
-	pinMode(D7, OUTPUT);	
-
 	Blynk.begin(auth, ssid, pass, IPAddress(192, 168, 137, 1), 8080);
 
 	lock = SecureLock();
-}
+	view = View();
+	lockAuth = Authentication();
 
+	lock.Lock();
+	view.BtnControlForUnlock();
+	view.ResetAuthPanel();
+}
+BLYNK_CONNECTED()
+{
+	Blynk.syncAll();
+}
 void loop()
 {
 	Blynk.run();
-
-	switch (lock.State())
-	{
-	case Locked:
-		Blynk.setProperty(V1, "offLabel", "Unlock");
-		Blynk.setProperty(V1, "onLabel", "Unlocking");
-		Blynk.setProperty(V1, "onBackColor", "#FFFF00");
-		Blynk.setProperty(V1, "offBackColor", "#FF0000");
-		break;
-	case Unlocked:
-		Blynk.setProperty(V1, "offLabel", "Lock");
-		Blynk.setProperty(V1, "onLabel", "Locking");
-		Blynk.setProperty(V1, "onBackColor", "#FFFF00");
-		Blynk.setProperty(V1, "offBackColor", "#00FF00");
-		break;
-	}
-	Blynk.virtualWrite(V3, lock.State());
 }
 
-BLYNK_WRITE(V1)
+BLYNK_WRITE(BtnControlPin)
 {
-	// read button state
+	// read btnControl state
 	int btnState = param.asInt();
 
+	// if btnControl is pressed
 	if (btnState == 1)
 	{
+		// perform based on the secure-lock's state
 		switch (lock.State())
 		{
-		case Locked:
-			lock.InitAuthNums();
+			// Unlocking if the secure-lock is locked
+		case LockState::Locked:
+			view.Message("Unloking the lock");
+			view.MessageLCD("Unlocking");
+
+			// Starting Authenticate if authorized person is standing in front of the secure-lock
+			lockAuth.Initialize();
+
+			view.Message("Authenticating");
+			view.UpdateAuthPanel(lockAuth.AuthNums);
+			view.MessageLCD("Auth number:", lockAuth.AuthKey);
 			break;
-		case Unlocked:
+			// Locking if the secure-lock is unlocked
+		case LockState::Unlocked:
+			view.Message("Locking the lock");
+			view.MessageLCD("Locking");
+
 			lock.Lock();
-			Blynk.virtualWrite(V1, 0);
+			view.BtnControlForUnlock();
+
+			view.Message("The secure-lock is locked");
+			view.MessageLCD("Locked");
 			break;
 		}
 		return;
 	}
 }
 
-BLYNK_WRITE(V2)
+BLYNK_WRITE(AuthenticatingPanelPin)
 {
 	if (param.asInt() == 1)
 	{
-		Blynk.virtualWrite(V2, 0);
+		Blynk.virtualWrite(AuthenticatingPanelPin, 0);
 		return;
 	}
-	if (lock.State() == Authenticating)
-	{
-		int authKey = param.asInt() - 2;
 
-		if (lock.Authenticate(authKey) == true)
+	if (lockAuth.State() == AuthState::Authenticating)
+	{
+		int authKeyIndex = param.asInt() - 2;
+
+		lockAuth.Authenticate(authKeyIndex);
+
+		if (lockAuth.State() == AuthState::Success)
 		{
+			view.Message("Authentication success");
+			view.MessageLCD("Auth success");
+
 			lock.Unlock();
+			view.BtnControlForLock();
+			view.Message("The secure-lock is unlocked");
+			view.MessageLCD("Unlocked");
+		}
+		else if (lockAuth.State() == AuthState::Failed)
+		{
+			view.Message("Authentication failed");
+			view.MessageLCD("Auth failed", "Cannot unlock");
 		}
 
-		Blynk.setProperty(V2, "labels", "No need Authentication");
-		Blynk.virtualWrite(V1, 0);
-	}
-	else
-	{
-		Blynk.virtualWrite(V2, 0);
+		lockAuth.Finish();
+		view.ResetAuthPanel();
 	}
 }
