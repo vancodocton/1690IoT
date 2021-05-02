@@ -3,5 +3,5 @@
     "board": "esp8266:esp8266:nodemcuv2",
     "sketch": "1690AssignmentDemo.ino",
     "output": "./build/",
-    "port": "COM7"
+    "port": "COM11"
 }

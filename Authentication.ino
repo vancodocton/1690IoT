@@ -39,4 +39,7 @@ bool Authentication::Authenticate(int index)
 void Authentication::Finish()
 {
     state = AuthState::NoNeed;
+    memset(AuthNums, 0, sizeof(AuthNums));
+    AuthKey = "";
+    authKeyIndex = 0;
 }

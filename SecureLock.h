@@ -2,15 +2,13 @@
 #define SecureLock_h
 
 #include <Servo.h>
-#include <Arduino.h>
 
-#include "View.h"
 #include "RGBLed.h"
 
 #define pinRed D8
 #define pinGreen D7
 #define pinBlue D6
-#define pinServo D0
+#define pinServo D4
 class SecureLock
 {
 public:

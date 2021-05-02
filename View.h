@@ -8,7 +8,6 @@
 #define VirtualTerminalPin V0
 #define BtnControlPin V1
 #define AuthenticatingPanelPin V2
-#define LockStateValuePin V3
 
 #define LCDAddress 0x27
 #define LCDColumns 16
@@ -23,7 +22,6 @@ public:
     void MessageLCD(String m1, String m2);
     void UpdateAuthPanel(int authNums[]);
     void ResetAuthPanel();
-    void UpdateLockState(String value);
     void BtnControlForUnlock();
     void BtnControlForLock();
 

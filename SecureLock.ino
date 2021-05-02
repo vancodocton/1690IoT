@@ -1,8 +1,4 @@
-#include <Arduino.h>
-
 #include "SecureLock.h"
-#include "View.h"
-#include <BlynkSimpleEsp8266.h>
 
 SecureLock::SecureLock()
 {
@@ -10,13 +6,8 @@ SecureLock::SecureLock()
 }
 bool SecureLock::Lock()
 {
-    led.On(Color::Blue);
-
     servo.write(0);
-
     
-    while (servo.read() != 0);
-
     state = Locked;
     led.On(Color::Red);
 
@@ -25,8 +16,6 @@ bool SecureLock::Lock()
 bool SecureLock::Unlock()
 {
     servo.write(90);
-
-    //while (servo.read() != 90);
 
     state = Unlocked;
     led.On(Color::Green);

@@ -28,6 +28,8 @@ void setup()
 	lock.Lock();
 	view.BtnControlForUnlock();
 	view.ResetAuthPanel();
+	view.Message("The secure-lock is locked");
+	view.MessageLCD("Locked");
 }
 BLYNK_CONNECTED()
 {
@@ -37,7 +39,7 @@ void loop()
 {
 	Blynk.run();
 }
-
+// Run if the controlling-button is pressed by the user
 BLYNK_WRITE(BtnControlPin)
 {
 	// read btnControl state
@@ -54,12 +56,14 @@ BLYNK_WRITE(BtnControlPin)
 			view.Message("Unloking the lock");
 			view.MessageLCD("Unlocking");
 
-			// Starting Authenticate if authorized person is standing in front of the secure-lock
+			// Starting to authenticate if authorized person is standing in front of the secure-lock
 			lockAuth.Initialize();
 
 			view.Message("Authenticating");
 			view.UpdateAuthPanel(lockAuth.AuthNums);
 			view.MessageLCD("Auth number:", lockAuth.AuthKey);
+			// The authentication process will be continuing if the user chooses the truth auth number
+			// that is displayed on the 16x2 LCD in the set of three number of the authenticating- panel
 			break;
 			// Locking if the secure-lock is unlocked
 		case LockState::Unlocked:
@@ -76,23 +80,27 @@ BLYNK_WRITE(BtnControlPin)
 		return;
 	}
 }
-
+// Run if the user had chosen the auth number in the set of three number of the authenticating-panel
 BLYNK_WRITE(AuthenticatingPanelPin)
 {
+	// If the option one that is used to show the status of the panel, ignore it
 	if (param.asInt() == 1)
 	{
 		Blynk.virtualWrite(AuthenticatingPanelPin, 0);
 		return;
 	}
-
+	// If the user choose auth number
 	if (lockAuth.State() == AuthState::Authenticating)
 	{
+		// Read the auth number index
 		int authKeyIndex = param.asInt() - 2;
 
+		// Authenticate by the user-selected auth num
 		lockAuth.Authenticate(authKeyIndex);
 
-		if (lockAuth.State() == AuthState::Success)
+		if (lockAuth.State() == AuthState::Success) // check authentication status
 		{
+			// unlock the secure-lock if succees
 			view.Message("Authentication success");
 			view.MessageLCD("Auth success");
 
@@ -103,10 +111,11 @@ BLYNK_WRITE(AuthenticatingPanelPin)
 		}
 		else if (lockAuth.State() == AuthState::Failed)
 		{
+			// prompt messagse for failed authentication
 			view.Message("Authentication failed");
 			view.MessageLCD("Auth failed", "Cannot unlock");
 		}
-
+		//Finish authentication and reset Authenticating-panel
 		lockAuth.Finish();
 		view.ResetAuthPanel();
 	}

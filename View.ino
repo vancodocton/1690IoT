@@ -37,10 +37,6 @@ void View::ResetAuthPanel()
 	Blynk.setProperty(AuthenticatingPanelPin, "labels", "No need Authentication");
 	Blynk.virtualWrite(AuthenticatingPanelPin, 0);
 }
-void View::UpdateLockState(String value)
-{
-	Blynk.virtualWrite(LockStateValuePin, value);
-}
 void View::BtnControlForUnlock()
 {
 	Blynk.setProperty(BtnControlPin, "offLabel", "Unlock");
